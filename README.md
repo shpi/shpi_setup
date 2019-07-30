@@ -73,7 +73,20 @@ sudo cp zero_std_setup/config.txt /boot/config.txt
 
 sudo cp zero_std_setup/rc.local /etc/rc.local
 
+
+wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.60.tar.gz
+
+tar zxvf bcm2835-1.60.tar.gz
+cd bcm2835-1.60
+./configure
+make
+sudo make check
+sudo make install
+
+cd ..
+
 cd zero_std_setup
+
 
 sudo gcc -o hello hello.c -lbcm2835
 
