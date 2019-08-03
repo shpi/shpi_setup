@@ -1,6 +1,8 @@
 1. download buster lite image or regular image for dekstop
 
-https://downloads.raspberrypi.org/raspbian_lite_latest
+426mb  - https://downloads.raspberrypi.org/raspbian_lite_latest
+1149mb -  https://downloads.raspberrypi.org/raspbian_latest
+
 
 infos how to flash sd card: https://www.raspberrypi.org/documentation/installation/installing-images/README.md
 
