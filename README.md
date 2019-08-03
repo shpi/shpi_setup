@@ -1,4 +1,4 @@
-1. download buster lite image
+1. download buster lite image or regular image for dekstop
 
 https://downloads.raspberrypi.org/raspbian_lite_latest
 
@@ -16,6 +16,7 @@ Create a file in the root of boot called: wpa_supplicant.conf
 
 Then copy the following code into it:
 
+```console
 country=US
 
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
@@ -30,7 +31,7 @@ network={
     psk="NETWORK-PASSWORD"
 
 }
-
+```
 
 Connect to your SHPI through SSH
 
@@ -106,11 +107,14 @@ sudo gcc -o hello hello.c -lbcm2835
 
 sudo gcc -o backlight backlight.c -lbcm2835
 
-gp backlight /home/pi/zero_thermostat_demo/backlight
+cp backlight /home/pi/zero_thermostat_demo/backlight
 
 optional:
 
 crontab -e
 
-insert line: @reboot python3 /home/pi/zero_thermostat_demo/demo.py
+insert line: 
 
+```console
+@reboot python3 /home/pi/zero_thermostat_demo/demo.py
+```
