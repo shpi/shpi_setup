@@ -5,7 +5,7 @@ sudo /usr/bin/gpio -g mode 27 out
 sudo /usr/bin/gpio -g write 19 1
 sudo /usr/bin/gpio -g mode 19 out
 sudo /usr/bin/gpio -g write 27 1
-sudo  /home/pi/hello
+sudo  /home/pi/zero_std_setup/hello
 sleep 3
 #sudo /usr/bin/dfu-programmer atmega32u4 erase
 #sudo /usr/bin/dfu-programmer atmega32u4 flash /home/pi/zero_avr_firmware_std/main.hex
