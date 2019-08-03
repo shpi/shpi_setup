@@ -17,12 +17,18 @@ Create a file in the root of boot called: wpa_supplicant.conf
 Then copy the following code into it:
 
 country=US
+
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+
 update_config=1
 
+
 network={
+
     ssid="NETWORK-NAME"
+
     psk="NETWORK-PASSWORD"
+
 }
 
 
@@ -73,25 +79,38 @@ sudo cp zero_std_setup/config.txt /boot/config.txt
 
 sudo cp zero_std_setup/rc.local /etc/rc.local
 
+git clone https://github.com/shpi/zero_other_demos.git
+
+
+sudo cp /home/pi/zero_std_setup/modules.conf /etc/modules-load.d/modules.conf
 
 wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.60.tar.gz
 
 tar zxvf bcm2835-1.60.tar.gz
+
 cd bcm2835-1.60
+
 ./configure
+
 make
+
 sudo make check
+
 sudo make install
 
 cd ..
 
 cd zero_std_setup
 
-
 sudo gcc -o hello hello.c -lbcm2835
+
+sudo gcc -o backlight backlight.c -lbcm2835
+
+gp backlight /home/pi/zero_thermostat_demo/backlight
 
 optional:
 
 crontab -e
-@reboot python3 /home/pi/zero_thermostat_demo/demo.py
+
+insert line: @reboot python3 /home/pi/zero_thermostat_demo/demo.py
 
