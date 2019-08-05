@@ -1,4 +1,4 @@
-1. download buster lite image or regular image for dekstop
+##1. download buster lite image or regular image for dekstop
 
 426mb  - https://downloads.raspberrypi.org/raspbian_lite_latest
 1149mb -  https://downloads.raspberrypi.org/raspbian_latest
@@ -7,12 +7,12 @@
 infos how to flash sd card: https://www.raspberrypi.org/documentation/installation/installing-images/README.md
 
 
-enable SSH:
+##2. enable SSH:
 
 create a "ssh" file in boot folder of sd card
 
 
-setup WIFI:
+##3. setup WIFI:
 
 Create a file in the root of boot called: wpa_supplicant.conf
 
@@ -35,58 +35,43 @@ network={
 }
 ```
 
-Connect to your SHPI through SSH
+##4. Connect to your SHPI through SSH and run following commands
 
-
+```
 sudo apt-get update
 
 sudo apt-get upgrade
 
-sudo apt-get install git
+sudo apt-get install git librrd-dev libpython3-dev python3-smbus python3-pip python3-pil python3-numpy dfu-programmer autotools-dev automake libusb-dev libusb-1.0-0 libusb-1.0-0-dev gcc-avr binutils-avr avr-libc wiringpi
 
-sudo apt-get install python3-pip
+sudo pip3 install RPi.GPIO pi3d rrdtool ics
+```
 
-sudo apt-get install python3-pil
+Clone SHPI programs to your SHPI
 
-sudo apt-get install python3-numpy
-
-sudo pip3 install RPi.GPIO
-
-sudo pip3 install pi3d
-
-sudo apt-get install librrd-dev libpython3-dev
-
-sudo pip3 install rrdtool
-
-sudo apt-get install python3-smbus
+```
+git clone https://github.com/shpi/zero_other_demos.git
 
 git clone https://github.com/shpi/zero_avr_firmware_std.git
 
 git clone https://github.com/shpi/zero_std_setup.git
 
 git clone https://github.com/shpi/zero_thermostat_demo.git
+```
 
-sudo apt-get install dfu-programmer
+Copy necessary system files (for GPIO setup, i2c module and startup scripts)
 
-sudo apt-get install autotools-dev
-
-sudo apt-get install automake
-
-sudo apt-get install libusb-dev libusb-1.0-0 libusb-1.0-0-dev
-
-sudo apt-get install gcc-avr binutils-avr avr-libc
-
-sudo apt-get install wiringpi
-
+```
 sudo cp zero_std_setup/config.txt /boot/config.txt
 
 sudo cp zero_std_setup/rc.local /etc/rc.local
 
-git clone https://github.com/shpi/zero_other_demos.git
-
-
 sudo cp /home/pi/zero_std_setup/modules.conf /etc/modules-load.d/modules.conf
+```
 
+Compile and build bcm2835 c library for drivers
+
+```
 wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.60.tar.gz
 
 tar zxvf bcm2835-1.60.tar.gz
@@ -111,9 +96,12 @@ sudo gcc -o backlight backlight.c -lbcm2835
 
 cp backlight /home/pi/zero_thermostat_demo/backlight
 
+chmod + x /home/pi/zero_thermostat_demo/backlight
+```
+
 optional:
 
-crontab -e
+sudo crontab -e
 
 insert line: 
 
