@@ -1,18 +1,19 @@
-##1. download buster lite image or regular image for dekstop
+## 1. download buster lite image or regular image for dekstop
 
 426mb  - https://downloads.raspberrypi.org/raspbian_lite_latest
+
 1149mb -  https://downloads.raspberrypi.org/raspbian_latest
 
 
 infos how to flash sd card: https://www.raspberrypi.org/documentation/installation/installing-images/README.md
 
 
-##2. enable SSH:
+## 2. enable SSH:
 
 create a "ssh" file in boot folder of sd card
 
 
-##3. setup WIFI:
+## 3. setup WIFI:
 
 Create a file in the root of boot called: wpa_supplicant.conf
 
@@ -35,7 +36,7 @@ network={
 }
 ```
 
-##4. Connect to your SHPI through SSH and run following commands
+## 4. Connect to your SHPI through SSH and run following commands
 
 ```
 sudo apt-get update
