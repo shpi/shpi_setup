@@ -22,7 +22,7 @@ Then copy the following code into it:
 ```console
 country=US
 
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+ctrl_interface=/var/run/wpa_supplicant GROUP=netdev
 
 update_config=1
 
@@ -97,7 +97,7 @@ sudo gcc -o backlight backlight.c -lbcm2835
 
 cp backlight /home/pi/zero_thermostat_demo/backlight
 
-chmod + x /home/pi/zero_thermostat_demo/backlight
+chmod +x /home/pi/zero_thermostat_demo/backlight
 ```
 
 optional:
