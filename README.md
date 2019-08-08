@@ -8,6 +8,11 @@
 infos how to flash sd card: https://www.raspberrypi.org/documentation/installation/installing-images/README.md
 
 
+username: pi
+
+pasword: raspberry
+
+
 ## 2. enable SSH:
 
 create a "ssh" file in boot folder of sd card
