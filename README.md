@@ -22,14 +22,18 @@ pasword: raspberry
 
 ## 2. enable SSH:
 
-create a "ssh" file in boot folder of sd card
+Enable SSH by placing a file named ssh (without extension), onto the boot partition of the SD card. The content of the file does not matter.
+
+Raspbian will have two partitions. Place the ssh file on to the smaller boot partition.
+
+
 
 
 ## 3. setup WIFI:
 
 Create a file in the root of boot called: wpa_supplicant.conf
 
-Then copy the following code into it:
+Then copy the following code into it (replace NETWORK-NAME and NETWORK-PASSWORD with your WIFI credentials):
 
 ```console
 country=US
