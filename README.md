@@ -1,3 +1,10 @@
+## Please note:
+
+
+You must follow all instructions. The display remains dark until the file boot/config.txt is present
+and the atmega is not started via "dfu-programmer". That's normal, no worries :-)
+
+
 ## 1. download buster lite image or regular image for dekstop
 
 426mb  - https://downloads.raspberrypi.org/raspbian_lite_latest
@@ -48,7 +55,7 @@ sudo apt-get update
 
 sudo apt-get upgrade
 
-sudo apt-get install git librrd-dev libpython3-dev python3-smbus python3-pip python3-pil python3-numpy dfu-programmer autotools-dev automake libusb-dev libusb-1.0-0 libusb-1.0-0-dev gcc-avr binutils-avr avr-libc wiringpi
+sudo apt-get install git omxplayer librrd-dev libpython3-dev python3-smbus python3-pip python3-pil python3-numpy dfu-programmer autotools-dev automake libusb-dev libusb-1.0-0 libusb-1.0-0-dev gcc-avr binutils-avr avr-libc wiringpi
 
 sudo pip3 install RPi.GPIO pi3d rrdtool ics
 ```
