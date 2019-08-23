@@ -116,6 +116,10 @@ cp backlight /home/pi/zero_thermostat_demo/backlight
 chmod +x /home/pi/zero_thermostat_demo/backlight
 ```
 
+For usage of touchscreen in desktop run: zero_other_demos/touchdriver.py
+
+Touchdriver is implemented in thermostat demo already.
+
 optional:
 
 sudo crontab -e
