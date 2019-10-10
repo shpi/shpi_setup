@@ -1,19 +1,77 @@
 #!/bin/sh -e
+sudo  /home/pi/zero_std_setup/hello
 sudo /opt/vc/bin/tvservice -o
-sudo /usr/bin/gpio -g mode 18 in
-sudo /usr/bin/gpio -g mode 27 out
 sudo /usr/bin/gpio -g write 19 1
 sudo /usr/bin/gpio -g mode 19 out
-sudo /usr/bin/gpio -g write 27 1
-sudo  /home/pi/zero_std_setup/hello
-sleep 1
+sudo /usr/bin/gpio -g mode 9 alt2
+sudo /usr/bin/gpio -g mode 8 alt2
+sudo /usr/bin/gpio -g mode 7 alt2
+sudo /usr/bin/gpio -g write 11 1
 sudo /usr/bin/gpio -g mode 11 out
+sudo /usr/bin/gpio -g mode 27 out
+sudo /usr/bin/gpio -g write 27 1
+sudo /usr/bin/gpio -g mode 10 out
 sleep 1
-sudo /usr/bin/gpio -g mode 11 in
-sleep 1
-#sudo /usr/bin/dfu-programmer atmega32u4 erase
-#sudo /usr/bin/dfu-programmer atmega32u4 flash /home/pi/zero_avr_firmware_std/main.hex
-sudo /usr/bin/dfu-programmer atmega32u4 start
 
+
+if lsusb | grep -o 03eb:2ff4
+then
+#zero with atmega
+ echo "SHPI.zero with ATmega detected"
+ sudo /usr/bin/gpio -g mode 1 alt2
+ sudo /usr/bin/gpio -g mode 27 out
+ sudo /usr/bin/gpio -g write 27 1
+ sleep 1
+ sudo /usr/bin/dfu-programmer atmega32u4 start || true
+
+ while ! i2cdetect -y 2 | grep -o 2a 
+ do 
+  sudo /usr/bin/gpio -g write 11 0
+  sleep 1
+  sudo /usr/bin/gpio -g write 11 1
+  sleep 1
+  sudo /usr/bin/dfu-programmer atmega32u4 erase || true
+  sudo /usr/bin/dfu-programmer atmega32u4 flash /home/pi/zero_avr_firmware_std/main.hex || true
+  sudo /usr/bin/dfu-programmer atmega32u4 start || true
+  sleep 1
+ done
+elif i2cdetect -y 2 | grep -o 2a
+then
+ echo "SHPI.zero with started ATmega"
+ sudo /usr/bin/gpio -g write 11 1
+else
+#zero lite
+ echo "SHPI.zero lite without ATmega detected"
+ gpio -g mode 10 input #used by PIR and RGB LED
+ gpio -g mode 18 pwm
+ gpio -g pwm 18 800 #pwm fan
+ gpio -g mode 27 out #is relais 1
+ #gpio -g mode 11 out #is relais 2
+ gpio -g mode 1 out #optional relais 3
+ sudo /home/pi/zero_lite_setup/init
+
+fi
+
+
+
+# check if usb hub is there and check cc2531 flash
+if lsusb | grep -o 214b:7000
+then
+ sleep 5
+ while ! lsusb | grep -o 0451:16ae
+ do
+  echo "Flashing CC2531"
+  sudo /home/pi/zero_std_setup/flashCC -f /home/pi/zero_std_setup/cc2531.hex || true
+  sudo /home/pi/zero_std_setup/flashCC -r || true
+  sleep 1
+  sudo /usr/bin/dfu-programmer atmega32u4 start || true
+  sleep 1
+ done
+fi
+
+sudo python /home/pi/zero_other_demos/touchdriver.py
+sleep 1
+cd /home/pi/zero_main_application/
+sudo python3 main.py
 
 exit 0
