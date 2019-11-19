@@ -73,7 +73,7 @@ git clone https://github.com/shpi/zero_avr_firmware_std.git
 
 git clone https://github.com/shpi/zero_std_setup.git
 
-git clone https://github.com/shpi/zero_thermostat_demo.git
+git clone https://github.com/shpi/zero_main_application.git
 ```
 
 Copy necessary system files (for GPIO setup, i2c module and startup scripts)
