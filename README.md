@@ -61,7 +61,7 @@ sudo apt-get upgrade
 
 sudo apt-get install git sshpass libgles2-mesa libgles2-mesa-dev omxplayer librrd-dev libpython3-dev python3-smbus python3-pip python3-pil python3-numpy dfu-programmer autotools-dev automake libusb-dev libusb-1.0-0 libusb-1.0-0-dev gcc-avr binutils-avr avr-libc wiringpi
 
-sudo pip3 install RPi.GPIO pi3d rrdtool ics
+sudo pip3 install RPi.GPIO pi3d rrdtool ics pyowm icalendar 
 ```
 
 Clone SHPI programs to your SHPI
@@ -111,9 +111,9 @@ sudo gcc -o hello hello.c -lbcm2835
 
 sudo gcc -o backlight backlight.c -lbcm2835
 
-cp backlight /home/pi/zero_thermostat_demo/backlight
+cp backlight /home/pi/zero_main_application/backlight
 
-chmod +x /home/pi/zero_thermostat_demo/backlight
+chmod +x /home/pi/zero__main_application/backlight
 ```
 
 For usage of touchscreen in desktop run: zero_other_demos/touchdriver.py
@@ -127,5 +127,5 @@ sudo crontab -e
 insert line: 
 
 ```console
-@reboot python3 /home/pi/zero_thermostat_demo/demo.py
+@reboot python3 /home/pi/zero_main_application/main.py
 ```
