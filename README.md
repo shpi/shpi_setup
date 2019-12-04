@@ -38,7 +38,7 @@ Then copy the following code into it (replace NETWORK-NAME and NETWORK-PASSWORD 
 ```console
 country=US
 
-ctrl_interface=/var/run/wpa_supplicant GROUP=netdev
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 
 update_config=1
 
@@ -71,7 +71,7 @@ git clone https://github.com/shpi/zero_other_demos.git
 
 git clone https://github.com/shpi/zero_avr_firmware_std.git
 
-git clone https://github.com/shpi/zero_std_setup.git
+git clone https://github.com/shpi/zero_setup.git
 
 git clone https://github.com/shpi/zero_main_application.git
 ```
@@ -79,11 +79,14 @@ git clone https://github.com/shpi/zero_main_application.git
 Copy necessary system files (for GPIO setup, i2c module and startup scripts)
 
 ```
-sudo cp zero_std_setup/config.txt /boot/config.txt
+sudo cp zero_setup/config.txt /boot/config.txt
 
-sudo cp zero_std_setup/rc.local /etc/rc.local
+sudo cp zero_setup/rc.local /etc/rc.local
+
+sudo cp zero_setup/cmdline.txt /boot/cmdline.txt
 
 sudo cp /home/pi/zero_std_setup/modules.conf /etc/modules-load.d/modules.conf
+
 ```
 
 Compile and build bcm2835 c library for drivers
@@ -105,7 +108,7 @@ sudo make install
 
 cd ..
 
-cd zero_std_setup
+cd zero_setup
 
 sudo gcc -o hello hello.c -lbcm2835
 
@@ -113,12 +116,12 @@ sudo gcc -o backlight backlight.c -lbcm2835
 
 cp backlight /home/pi/zero_main_application/backlight
 
-chmod +x /home/pi/zero__main_application/backlight
+chmod +x /home/pi/zero_main_application/backlight
 ```
 
-For usage of touchscreen in desktop run: zero_other_demos/touchdriver.py
+For usage of touchscreen in desktop run: zero_setup/touchdriver.py
 
-Touchdriver is implemented in thermostat demo already.
+Touchdriver is not necessary for main app.
 
 optional:
 
@@ -135,13 +138,21 @@ insert line:
 init.c   - initialize lcd
 
 gpio 10  is used for RGB LED and PIR, this works because the PIR goes high for several seconds if movement detected.
+
 gpio 18  is fan (u can use PWM to control speed)
+
 gpio 26  is touchinterrupt
+
 gpio 19 is backlight control
+
 gpio 27 is relais  1
+
 gpio 11 is relais 2
+
 gpio 1   is relais 3
+
 i2c device 0x48 is ADS1015
+
 ADS1015 alert can be used to control Buzzer
 
 to control  RGB led use  -> https://github.com/jgarff/rpi_ws281x    and command ./test -g 10
