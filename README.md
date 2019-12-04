@@ -129,3 +129,25 @@ insert line:
 ```console
 @reboot python3 /home/pi/zero_main_application/main.py
 ```
+
+## Zero Lite GPIO Configuration
+
+init.c   - initialize lcd
+
+gpio 10  is used for RGB LED and PIR, this works because the PIR goes high for several seconds if movement detected.
+gpio 18  is fan (u can use PWM to control speed)
+gpio 26  is touchinterrupt
+gpio 19 is backlight control
+gpio 27 is relais  1
+gpio 11 is relais 2
+gpio 1   is relais 3
+i2c device 0x48 is ADS1015
+ADS1015 alert can be used to control Buzzer
+
+to control  RGB led use  -> https://github.com/jgarff/rpi_ws281x    and command ./test -g 10
+
+
+
+
+
+

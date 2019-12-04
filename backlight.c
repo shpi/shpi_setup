@@ -60,10 +60,12 @@ if (errors > 3) {initbl();}
 }
 
 }
-
+bcm2835_gpio_fsel(BLT,BCM2835_GPIO_FSEL_OUTP);
+bcm2835_gpio_write(BLT, HIGH);
 
     bcm2835_close();
     return 0;
 }
+
 
 

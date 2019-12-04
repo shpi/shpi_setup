@@ -1,5 +1,6 @@
 #!/bin/sh -e
-sudo  /home/pi/zero_std_setup/hello
+sudo /bin/cat /etc/shadow | /bin/grep pi > /var/www/html/.htpasswd
+sudo  /home/pi/zero_setup/hello
 sudo /opt/vc/bin/tvservice -o
 sudo /usr/bin/gpio -g write 19 1
 sudo /usr/bin/gpio -g mode 19 out
@@ -10,7 +11,7 @@ sudo /usr/bin/gpio -g write 11 1
 sudo /usr/bin/gpio -g mode 11 out
 sudo /usr/bin/gpio -g mode 27 out
 sudo /usr/bin/gpio -g write 27 1
-sudo /usr/bin/gpio -g mode 10 out
+sudo /usr/bin/gpio -g mode 10 alt2
 sleep 1
 
 
@@ -22,7 +23,7 @@ then
  sudo /usr/bin/gpio -g mode 27 out
  sudo /usr/bin/gpio -g write 27 1
  sleep 1
- sudo /usr/bin/dfu-programmer atmega32u4 start || true
+ #sudo /usr/bin/dfu-programmer atmega32u4 start || true
 
  while ! i2cdetect -y 2 | grep -o 2a 
  do 
@@ -33,7 +34,7 @@ then
   sudo /usr/bin/dfu-programmer atmega32u4 erase || true
   sudo /usr/bin/dfu-programmer atmega32u4 flash /home/pi/zero_avr_firmware_std/main.hex || true
   sudo /usr/bin/dfu-programmer atmega32u4 start || true
-  sleep 1
+  sleep 2
  done
 elif i2cdetect -y 2 | grep -o 2a
 then
@@ -48,7 +49,7 @@ else
  gpio -g mode 27 out #is relais 1
  #gpio -g mode 11 out #is relais 2
  gpio -g mode 1 out #optional relais 3
- sudo /home/pi/zero_lite_setup/init
+ sudo /home/pi/zero_setup/init
 
 fi
 
@@ -61,15 +62,15 @@ then
  while ! lsusb | grep -o 0451:16ae
  do
   echo "Flashing CC2531"
-  sudo /home/pi/zero_std_setup/flashCC -f /home/pi/zero_std_setup/cc2531.hex || true
-  sudo /home/pi/zero_std_setup/flashCC -r || true
+  sudo /home/pi/zero_setup/flashCC -f /home/pi/zero_setup/cc2531.hex || true
+  sudo /home/pi/zero_setup/flashCC -r || true
   sleep 1
   sudo /usr/bin/dfu-programmer atmega32u4 start || true
   sleep 1
  done
 fi
 
-sudo python /home/pi/zero_other_demos/touchdriver.py
+sudo python /home/pi/zero_setup/touchdriver.py
 sleep 1
 cd /home/pi/zero_main_application/
 sudo python3 main.py
