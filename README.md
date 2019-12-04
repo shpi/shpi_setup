@@ -59,7 +59,7 @@ sudo apt-get update
 
 sudo apt-get upgrade
 
-sudo apt-get install git sshpass libgles2-mesa libgles2-mesa-dev omxplayer librrd-dev libpython3-dev python3-smbus python3-pip python3-pil python3-numpy dfu-programmer autotools-dev automake libusb-dev libusb-1.0-0 libusb-1.0-0-dev gcc-avr binutils-avr avr-libc wiringpi
+sudo apt-get install git sshpass libgles2-mesa libgles2-mesa-dev omxplayer librrd-dev libpython3-dev python3-smbus python3-pip python3-pil python3-numpy dfu-programmer autotools-dev automake libusb-dev libusb-1.0-0 libusb-1.0-0-dev gcc-avr binutils-avr avr-libc wiringpi nginx php-fpm
 
 sudo pip3 install RPi.GPIO pi3d rrdtool ics pyowm icalendar 
 ```
@@ -85,7 +85,7 @@ sudo cp zero_setup/rc.local /etc/rc.local
 
 sudo cp zero_setup/cmdline.txt /boot/cmdline.txt
 
-sudo cp /home/pi/zero_std_setup/modules.conf /etc/modules-load.d/modules.conf
+sudo cp /home/pi/zero_setup/modules.conf /etc/modules-load.d/modules.conf
 
 ```
 
