@@ -12,6 +12,8 @@ void writebl(signed int a){
  bcm2835_delayMicroseconds(40);
  if (a == 0) {bcm2835_delayMicroseconds(50);    }
  bcm2835_gpio_fsel(BLT, BCM2835_GPIO_FSEL_INPT);
+ bcm2835_gpio_set_pud(BLT, BCM2835_GPIO_PUD_UP);
+
  if (a == 1) {bcm2835_delayMicroseconds(50); }
  bcm2835_delayMicroseconds(40);
 }
@@ -21,11 +23,15 @@ bcm2835_gpio_fsel(BLT, BCM2835_GPIO_FSEL_OUTP);
 bcm2835_gpio_clr(BLT);
 bcm2835_delayMicroseconds(4000);
 bcm2835_gpio_fsel(BLT, BCM2835_GPIO_FSEL_INPT);
+bcm2835_gpio_set_pud(BLT, BCM2835_GPIO_PUD_UP);
+
 bcm2835_delayMicroseconds(120);
 bcm2835_gpio_fsel(BLT, BCM2835_GPIO_FSEL_OUTP);
 bcm2835_gpio_clr(BLT);
 bcm2835_delayMicroseconds(500);
 bcm2835_gpio_fsel(BLT, BCM2835_GPIO_FSEL_INPT);
+bcm2835_gpio_set_pud(BLT, BCM2835_GPIO_PUD_UP);
+
 bcm2835_delayMicroseconds(5);
 }
 
