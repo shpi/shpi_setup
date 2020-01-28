@@ -4,8 +4,8 @@
 #define CLK RPI_V2_GPIO_P1_03 // BCM 2
 #define MOSI RPI_V2_GPIO_P1_12 // reuse fan gpio
 #define CS RPI_V2_GPIO_P1_35 // use backlight
-#define DELAY 50 // clock pulse time in microseconds
-#define WAIT 120 // wait time in milliseconds
+#define DELAY 1 // clock pulse time in microseconds
+#define WAIT 250 // wait time in milliseconds
 
 #define PIN RPI_V2_GPIO_P1_35
 
@@ -62,12 +62,14 @@ void write(uint16_t command, uint8_t count){
 void setup_lcd(void){
     int count = sizeof(commands) / sizeof(int32_t);
     int x;
+
+    for (int x = 0; x < 11; x++) { write(commands2[x], 16);  }
+    
+
     for(x = 0; x < count; x++){ int32_t command = commands[x];     if(command == -1){bcm2835_delay(WAIT);         continue; }        write((uint16_t)command,9);    }
 
 
-for (int x = 0; x < 11; x++) {
-    write(commands2[x], 16);
-  }
+
 
 }
 
