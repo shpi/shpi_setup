@@ -1,78 +1,113 @@
 #!/bin/sh -e
-sudo /bin/cat /etc/shadow | /bin/grep pi > /var/www/html/.htpasswd
-sudo  /home/pi/zero_setup/hello
-sudo /opt/vc/bin/tvservice -o
-sudo /usr/bin/gpio -g write 19 1
-sudo /usr/bin/gpio -g mode 19 out
-sudo /usr/bin/gpio -g mode 9 alt2
-sudo /usr/bin/gpio -g mode 8 alt2
-sudo /usr/bin/gpio -g mode 7 alt2
-sudo /usr/bin/gpio -g write 11 1
-sudo /usr/bin/gpio -g mode 11 out
-sudo /usr/bin/gpio -g mode 27 out
-sudo /usr/bin/gpio -g write 27 1
-sudo /usr/bin/gpio -g mode 10 alt2
-sleep 1
+
+# Programs
+I2CDETECT="/usr/sbin/i2cdetect"
+GPIO="/usr/bin/gpio"
+SLEEP="/bin/sleep"
+PYTHON3="/usr/bin/python3"
+DFUP="/usr/bin/dfu-programmer"
+LSUSB="/usr/bin/lsusb"
+FLASHCC="/home/pi/zero_setup/flashCC"
+GREP="/bin/grep"
+TOUCHDRIVER="/home/pi/zero_setup/touchdriver.py"
 
 
-if lsusb | grep -o 03eb:2ff4
-then
-#zero with atmega
- echo "SHPI.zero with ATmega detected"
- sudo /usr/bin/gpio -g mode 1 alt2
- sudo /usr/bin/gpio -g mode 27 out
- sudo /usr/bin/gpio -g write 27 1
- sleep 1
- #sudo /usr/bin/dfu-programmer atmega32u4 start || true
+# USB hardware IDs
+ATMEGA_HWID="03eb:2ff4"
+USBHUB_HWID="214b:7000"
+ZIGBEE_HWID="0451:16ae"
 
- while ! i2cdetect -y 2 | grep -o 2a 
- do 
-  sudo /usr/bin/gpio -g write 11 0
-  sleep 1
-  sudo /usr/bin/gpio -g write 11 1
-  sleep 1
-  sudo /usr/bin/dfu-programmer atmega32u4 erase || true
-  sudo /usr/bin/dfu-programmer atmega32u4 flash /home/pi/zero_avr_firmware_std/main.hex || true
-  sudo /usr/bin/dfu-programmer atmega32u4 start || true
-  sleep 2
+# I2C addresses
+I2C_ATMEGA="2a"
+
+# Firmware files
+AVR_FW="/home/pi/zero_avr_firmware_std/main.hex"
+ZIGBEE_FW="/home/pi/zero_setup/cc2531.hex"
+
+HTMLROOT="/var/www/html"
+
+### Starting setup ###
+
+# Update webpage credentials if WEBROOT exists
+if [ -d "$HTMLROOT" ]; then
+ $GREP "^pi" "/etc/shadow" > "${HTMLROOT}/.htpasswd"
+fi
+
+#
+/home/pi/zero_setup/hello
+
+#
+/opt/vc/bin/tvservice -o
+
+# Setup GPIOs
+$GPIO -g write 19 1
+$GPIO -g mode 19 out
+$GPIO -g mode 9 alt2
+$GPIO -g mode 8 alt2
+$GPIO -g mode 7 alt2
+$GPIO -g write 11 1
+$GPIO -g mode 11 out
+$GPIO -g mode 27 out
+$GPIO -g write 27 1
+$GPIO -g mode 10 alt2
+$SLEEP 1
+
+if $LSUSB | $GREP -o "$ATMEGA_HWID"; then
+ # zero with atmega
+ echo "SHPI.zero with ATmega detected (USB)"
+ $GPIO -g mode 1 alt2
+ $GPIO -g mode 27 out
+ $GPIO -g write 27 1
+ $SLEEP 1
+ #$DFUP atmega32u4 start || true
+
+ while ! $I2CDETECT -y 2 | $GREP -o " $I2C_ATMEGA"; do
+  $GPIO -g write 11 0
+  $SLEEP 1
+  $GPIO -g write 11 1
+  $SLEEP 1
+  $DFUP atmega32u4 erase || true
+  $DFUP atmega32u4 flash "$AVR_FW" || true
+  $DFUP atmega32u4 start || true
+  $SLEEP 2
  done
-elif i2cdetect -y 2 | grep -o 2a
-then
- echo "SHPI.zero with started ATmega"
- sudo /usr/bin/gpio -g write 11 1
+elif $I2CDETECT -y 2 | $GREP -o " $I2C_ATMEGA"; then
+ echo "SHPI.zero with started ATmega (I2C)"
+ $GPIO -g write 11 1
 else
 #zero lite
  echo "SHPI.zero lite without ATmega detected"
- gpio -g mode 10 input #used by PIR and RGB LED
- gpio -g mode 18 pwm
- gpio -g pwm 18 800 #pwm fan
- gpio -g mode 27 out #is relais 1
- #gpio -g mode 11 out #is relais 2
- gpio -g mode 1 out #optional relais 3
- sudo /home/pi/zero_setup/init
-
+ $GPIO -g mode 10 input #used by PIR and RGB LED
+ $GPIO -g mode 18 pwm
+ $GPIO -g pwm 18 800 #pwm fan
+ $GPIO -g mode 27 out #is relais 1
+ #$GPIO -g mode 11 out #is relais 2
+ $GPIO -g mode 1 out #optional relais 3
+ /home/pi/zero_setup/init
 fi
 
-
-
 # check if usb hub is there and check cc2531 flash
-if lsusb | grep -o 214b:7000
-then
- sleep 5
- while ! lsusb | grep -o 0451:16ae
+if $LSUSB | $GREP -o "$USBHUB_HWID"; then
+ $SLEEP 5
+ while ! $LSUSB | $GREP -o "$ZIGBEE_HWID"
  do
   echo "Flashing CC2531"
-  sudo /home/pi/zero_setup/flashCC -f /home/pi/zero_setup/cc2531.hex || true
-  sudo /home/pi/zero_setup/flashCC -r || true
-  sleep 1
-  sudo /usr/bin/dfu-programmer atmega32u4 start || true
-  sleep 1
+  $FLASHCC -f "$ZIGBEE_FW" || true
+  $FLASHCC -r || true
+  $SLEEP 1
+  $DFUP atmega32u4 start || true
+  $SLEEP 1
  done
 fi
 
-sudo python /home/pi/zero_setup/touchdriver.py
-sleep 1
+if [ -f "$TOUCHDRIVER" ]; then
+ echo "Starting touchdriver.py
+ $PYTHON3 "$TOUCHDRIVER"
+ $SLEEP 1
+fi
+
 cd /home/pi/zero_main_application/
-sudo python3 main.py
+echo "Starting zero_main_application"
+$PYTHON3 main.py
 
 exit 0
