@@ -101,7 +101,7 @@ if $LSUSB | $GREP -o "$USBHUB_HWID"; then
 fi
 
 if [ -f "$TOUCHDRIVER" ]; then
- echo "Starting touchdriver.py
+ echo "Starting touchdriver.py"
  $PYTHON3 "$TOUCHDRIVER"
  $SLEEP 1
 fi
