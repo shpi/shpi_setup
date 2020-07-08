@@ -103,7 +103,7 @@ def touchint(channel):
       ui.write(e.EV_KEY, e.BTN_TOUCH, 0)
       ui.write(e.EV_SYN, 0, 0)
       ui.syn()
-      print('released')
+      #print('released')
 
 gpio.add_event_detect(INT, gpio.BOTH, callback=touchint)      #touch interrupt
 
@@ -111,7 +111,7 @@ gpio.add_event_detect(INT, gpio.BOTH, callback=touchint)      #touch interrupt
 def write_status(x, y):
             global start
             if start:
-              print('touched')
+              #print('touched')
               ui.write(e.EV_KEY, e.BTN_TOUCH, 1)
               start = 0            
 
@@ -137,7 +137,7 @@ def smbus_read_touch():
           if ((-80 < (xc-x) < 80) & (-80 < (yc-y) < 80)):  #catch bounches
             xc, yc = x, y
             write_status(800-x, 480-y)
-            print(800-xc,480-yc)
+            #print(800-xc,480-yc)
           elif 801 > x > 0:
             xc, yc = x,y
             time.sleep(0.02)          
