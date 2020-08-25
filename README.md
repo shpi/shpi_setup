@@ -121,6 +121,13 @@ cp backlight /home/pi/zero_main_application/backlight
 chmod +x /home/pi/zero_main_application/backlight
 ```
 
+
+## Backlight
+
+backlight.c is only necessary for SHPI.zero prototype (without USB hub and soundchip) and SHPI.zero lite. On all other SHPI's the backlight is controlled via ATmega with I2C command.
+
+
+
 For usage of touchscreen in desktop run: zero_setup/touchdriver.py
 
 Touchdriver is not necessary for main app.
@@ -135,9 +142,9 @@ insert line:
 @reboot python3 /home/pi/zero_main_application/main.py
 ```
 
-## Zero Lite GPIO Configuration
+## Differences for SHPI.zero Lite -  GPIO Configuration
 
-init.c   - initialize lcd
+init.c   - initialize lcd, **only necessary for SHPI.zero lite**
 
 gpio 10  is used for RGB LED and PIR, this works because the PIR goes high for several seconds if movement detected.
 
