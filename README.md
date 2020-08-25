@@ -127,20 +127,13 @@ chmod +x /home/pi/zero_main_application/backlight
 backlight.c is only necessary for SHPI.zero prototype (without USB hub and soundchip) and SHPI.zero lite. On all other SHPI's the backlight is controlled via ATmega with I2C command.
 
 
+## Touchscreen
 
 For usage of touchscreen in desktop run: zero_setup/touchdriver.py
 
 Touchdriver is not necessary for main app.
 
-optional:
 
-sudo crontab -e
-
-insert line: 
-
-```console
-@reboot python3 /home/pi/zero_main_application/main.py
-```
 
 ## Differences for SHPI.zero Lite -  GPIO Configuration
 
