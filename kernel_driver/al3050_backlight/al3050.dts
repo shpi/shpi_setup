@@ -1,0 +1,21 @@
+/dts-v1/;
+/plugin/;
+
+/{
+    compatible = "brcm,bcm2835", "brcm,bcm2836", "brcm,bcm2708", "brcm,bcm2709";
+
+       fragment@0 {
+                target-path = "/soc";
+                __overlay__ {
+                        backlight: backlight {
+                                compatible = "al3050_bl";
+                                gpios = <&gpio 19 0>; /* GPIO_ACTIVE_HIGH */
+                                fb = <0xdeadbeef>;
+
+                        };
+                };
+        };
+
+
+ 
+};
