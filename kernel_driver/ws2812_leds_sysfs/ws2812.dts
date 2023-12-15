@@ -1,0 +1,72 @@
+/*
+ * Device Tree overlay for SPI WS2812 
+ *
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835", "brcm,bcm2708", "brcm,bcm2709";
+
+   fragment@0 {
+        target = <&gpio>;
+        _overlay__ {
+
+                spi0_pins: spi0_pins {
+                        brcm,pins = <10>;
+                        brcm,function = <4>; /* alt0 */
+                };
+                };
+                };
+
+   fragment@1 {
+        target = <&spidev0>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+   fragment@2 {
+        target = <&spidev1>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+
+
+
+	fragment@3 {
+		target = <&spi0>;
+		__overlay__ {
+			/* needed to avoid dtc warning */
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+			ws2812@0{
+				compatible = "ws2812";
+				reg = <0>;
+                                spi-max-frequency = <125000000>;
+				num-leds = <29>;
+				color-order= "GRB"; 
+				is-zero-lite = <1>;
+				#address-cells = <1>;
+	                        #size-cells = <0>;
+
+
+            multi-led@0 {
+                /*
+                 * No subnodes are needed, this controller only supports RGB
+                 * LEDs.
+                 */
+                reg = <0>;
+                color = <8>;
+                
+            };
+
+
+			};
+		};
+	};
+
+};
