@@ -1,0 +1,6 @@
+#!/bin/bash
+[[ ! -d /tmp/initramfs ]] && {  mkdir /tmp/initramfs || { echo "ERROR:  Cannot create /tmp/initramfs"; exit 1; } }
+cd /tmp/initramfs || { echo "ERROR:  Cannot change to /tmp/initramfs"; exit 1; }
+mkdir -p {bin,dev,etc/splash,lib,mnt/root,proc,root,sbin,sys,/usr/lib} || { echo "ERROR:  Cannot create Root Structure"; exit 1; }
+sudo cp -a /dev/{fb0,tty,console,mmcblk*,null} /tmp/initramfs/dev || { echo "ERROR:  Cannot copy device nodes"; exit 1;}
+echo "SUCCESSS:  Initramfs base created";

@@ -1,0 +1,227 @@
+/dts-v1/;
+/plugin/;
+
+/{
+	compatible = "brcm,bcm2835";
+
+
+	fragment@0 {
+		target = <&fb>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&dpi18_pins>;
+		};
+	};
+
+	fragment@1 {
+		target = <&vc4>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&dpi18_pins>;
+		};
+	};
+
+	fragment@2 {
+		target = <&gpio>;
+		__overlay__ {
+			dpi18_pins: dpi18_pins {
+				brcm,pins = <0 1 2 3 4 5 6 7 8 9
+					     12 13 14 15 16 17 20
+					     21 22 23 24 25>; /* no 10, 19, 27 */
+				brcm,function = <6>; /* alt2 */
+				brcm,pull = <0>; /* no pull */
+			};
+		};
+	};
+	
+	
+    fragment@3 {
+                target = <&gpio>;
+                __overlay__ {
+                        goodix_pins: goodix_pins {
+                                brcm,pins = <26 11>; // interrupt and reset
+                                brcm,function = <0 0>; // in
+                                brcm,pull = <2 2>; // pull-up
+                        };
+                };
+        };
+	
+
+    fragment@4 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            ft6236: ft6236@5d {
+                compatible = "goodix,gt911";
+                reg = <0x5d>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&goodix_pins>;
+                interrupt-parent = <&gpio>;
+                interrupts = <26 2>;
+                touchscreen-size-x = <480>;
+                touchscreen-size-y = <800>;
+                touchscreen-inverted-x;
+                touchscreen-inverted-y;
+                touchscreen-swapped-x-y;
+                touchscreen-refresh-rate = <5>;
+            };
+        };
+    };	
+    fragment@5 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            ft62362: ft62362@14 {
+                compatible = "goodix,gt911";
+                reg = <0x14>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&goodix_pins>;
+                interrupt-parent = <&gpio>;
+                interrupts = <26 2>;
+                touchscreen-size-x = <480>;
+                touchscreen-size-y = <800>;
+                touchscreen-inverted-x;
+                touchscreen-inverted-y;
+                touchscreen-swapped-x-y;
+                touchscreen-refresh-rate = <5>;
+            };
+        };
+    };
+
+
+ fragment@6 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            mlx90615@5b {
+                compatible = "mlx90615";
+                reg = <0x5b>;
+
+            };
+        };
+    };
+
+
+
+    fragment@7 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            bh1750@23 {
+                compatible = "bh1750";
+                reg = <0x23>;
+
+            };
+        };
+    };
+
+
+
+    fragment@8 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            ina219@45 {
+                compatible = "ti,ina219";
+                reg = <0x45>;
+		shunt-resistor = <100000>;
+
+            };
+        };
+    };
+
+
+
+    fragment@9 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            sht3x@44 {
+                compatible = "sensirion,sht3x";
+                reg = <0x44>;             
+
+            };
+        };
+    };
+
+
+    fragment@10 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            bmp280@77 {
+                compatible = "bosch,bmp280";
+                reg = <0x77>;
+                
+
+            };
+        };
+    };
+
+
+
+
+   fragment@11 {
+        target = <&i2c2>;
+
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+
+	    shpi@2a {
+            compatible = "shpi";
+            reg = <0x2a>;
+            };
+
+    };
+
+    };
+
+
+       fragment@12 {
+                // Configure the gpio pin controller
+                target = <&gpio>;
+                __overlay__ {
+                        pin_state: motion_pins {
+                                brcm,pins = <18 10>; // gpio number, 10 used for speaker amp, so we keep it on, bit hacky here
+                                brcm,function = <0 0>; // 0 = input, 1 = output
+                                brcm,pull = <1 2>; // 0 = none, 1 = pull down, 2 = pull up
+                        };
+                };
+        };
+        fragment@13 {
+                target-path = "/";
+                __overlay__ {
+                        motion: motion {
+                                compatible = "gpio-keys";
+                                pinctrl-names = "default";
+                                pinctrl-0 = <&pin_state>;
+                                status = "okay";
+                                autorepeat;
+
+                                key: key {
+                                        linux,code = <132>;
+                                        gpios = <&gpio 18 0>;
+                                        label = "MOTION_1";
+                                };
+                        };
+                };
+        };
+
+
+};

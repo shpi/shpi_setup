@@ -1,0 +1,178 @@
+/dts-v1/;
+/plugin/;
+
+/{
+	compatible = "brcm,bcm2835";
+
+
+	fragment@0 {
+		target = <&fb>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&dpi18_pins>;
+		};
+	};
+
+	fragment@1 {
+		target = <&vc4>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&dpi18_pins>;
+		};
+	};
+
+	fragment@2 {
+		target = <&gpio>;
+		__overlay__ {
+			dpi18_pins: dpi18_pins {
+				brcm,pins = <0 1 2 3 4 5 6 7 8 9
+					     12 13 14 15 16 17 20
+					     21 22 23 24 25>; /* no 10, 19, 27 */
+				brcm,function = <6>; /* alt2 */
+				brcm,pull = <0>; /* no pull */
+			};
+		};
+	};
+	
+	
+    fragment@3 {
+                target = <&gpio>;
+                __overlay__ {
+                        cyc8c2_pins: cyc8c2_pins {
+                                brcm,pins = <26>; // interrupt
+                                brcm,function = <0>; // in
+                                brcm,pull = <0>; // pull-down
+                        };
+                };
+        };
+
+
+        fragment@4 {
+        target = <&i2c2>;
+
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            cyc8c2: cyc8c2@5c {
+                compatible = "cyc8c2";
+                reg = <0x5c>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&cyc8c2_pins>;
+                interrupt-parent = <&gpio>;
+		sensivity = <0x40>;
+                interrupts = <26 2>;
+                irq-gpios = <&gpio 26 0>;
+                touchscreen-inverted-x;
+                touchscreen-inverted-y;
+
+
+            };
+        };
+    };
+
+
+
+    fragment@5 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            mlx90615@5b {
+                compatible = "mlx90615";
+                reg = <0x5b>;
+            };
+        };
+    };
+
+    fragment@6 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            bh1750@23 {
+                compatible = "bh1750";
+                reg = <0x23>;
+
+            };
+        };
+    };
+
+    fragment@7 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            aht10@38 {
+                compatible = "aht10";
+                reg = <0x38>;
+
+            };
+        };
+    };
+
+    fragment@8 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            bmp280@77 {
+                compatible = "bosch,bmp280";
+                reg = <0x77>;
+            };
+        };
+    };
+
+   fragment@9 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+	    shpi@2a {
+            compatible = "shpi";
+            reg = <0x2a>;
+            };
+     };
+    };
+
+       fragment@10 {
+                // Configure the gpio pin controller
+                target = <&gpio>;
+                __overlay__ {
+                        pin_state: motion_pins {
+                                brcm,pins = <18>; // gpio number
+                                brcm,function = <0>; // 0 = input, 1 = output
+                                brcm,pull = <1>; // 0 = none, 1 = pull down, 2 = pull up
+                        };
+                };
+        };
+        fragment@11 {
+                target-path = "/";
+                __overlay__ {
+                        motion: motion {
+                                compatible = "gpio-keys";
+                                pinctrl-names = "default";
+                                pinctrl-0 = <&pin_state>;
+                                status = "okay";
+                                autorepeat;
+
+                                key: key {
+                                        linux,code = <132>;
+                                        gpios = <&gpio 18 0>;
+                                        label = "MOTION_1";
+                                };
+                        };
+                };
+        };
+
+
+
+
+
+	
+};

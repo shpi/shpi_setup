@@ -1,0 +1,4 @@
+dpi_output_format=0x07F216
+display_rotate=3
+hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6
+#gpio=10=op,dh ampflifier

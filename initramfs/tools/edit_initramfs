@@ -1,0 +1,9 @@
+#!/bin/bash
+[[ ! -d /tmp/initramfs ]] && {  mkdir /tmp/initramfs || { echo "ERROR:  Cannot create /tmp/initramfs"; exit 1; } }
+cd /tmp/initramfs || { echo "ERROR:  Cannot change to /tmp/initramfs"; exit 1; }
+zcat /boot/initramfs.img | sudo cpio -idmv
+if [ $? = 0 ] 
+  then echo "SUCCESSS:  Unpacking Successful";
+  else echo "ERROR:  Unpacking Failed!";
+fi
+

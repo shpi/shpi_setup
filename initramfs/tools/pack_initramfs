@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /tmp/initramfs || exit 1
+[[ ! -x init ]] && { echo "ERROR:  Missing init! init wasn't found or isn't executable"; exit 1; }
+[[ ! -x bin/busybox ]] && { echo "ERROR:  Missing busybox!"; exit 1; }
+find . | cpio -oH newc | gzip -9 | sudo tee /boot/initramfs.img > /dev/null

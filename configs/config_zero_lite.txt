@@ -1,0 +1,6 @@
+dpi_output_format=0x06F216
+display_rotate=2
+hdmi_timings=800 0 50 20 70 480 0 3 1 3 0 0 0 60 0 32000000 6
+gpio=19=pu
+
+

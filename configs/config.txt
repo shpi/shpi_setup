@@ -1,0 +1,12 @@
+initial_turbo=30
+disable_splash=1
+hdmi_blanking=0
+boot_delay=0
+force_turbo=0
+disable_overscan=1
+gpu_mem=128
+framebuffer_height=480
+framebuffer_width=800
+dtparam=i2c2_iknowwhatimdoing=on
+gpio=27=op,dh
+gpio=10=op,dl
