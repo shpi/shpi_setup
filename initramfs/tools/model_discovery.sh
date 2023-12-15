@@ -206,6 +206,21 @@ for model in $MODEL_NAMES; do
         echo "[0x$serial]" >> /mnt/boot/config.txt
         echo "model=$model" >> /mnt/boot/config.txt
         echo "dtoverlay=${model}" >> /mnt/boot/config.txt
+
+        case "$model" in
+        shpi_zero*)
+        echo "dpi_output_format=0x06F216" >> /mnt/boot/config.txt
+        echo "display_rotate=2" >> /mnt/boot/config.txt
+        echo "hdmi_timings=800 0 50 20 70 480 0 3 1 3 0 0 0 60 0 32000000 6" >> /mnt/boot/config.txt
+        ;;
+        shpi_one*)
+        echo "dpi_output_format=0x07F216" >> /mnt/boot/config.txt
+        echo "display_rotate=3" >> /mnt/boot/config.txt
+        echo "hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6" >> /mnt/boot/config.txt
+        ;;
+        esac
+
+
         sync
         umount /mnt/boot
         echo b > /proc/sysrq-trigger

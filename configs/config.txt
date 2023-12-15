@@ -1,8 +1,7 @@
-initial_turbo=30
-disable_splash=1
-hdmi_blanking=0
+initial_turbo=60
+disable_splash=0
+hdmi_blanking=1
 boot_delay=0
-force_turbo=0
 disable_overscan=1
 gpu_mem=128
 framebuffer_height=480
@@ -10,3 +9,12 @@ framebuffer_width=800
 dtparam=i2c2_iknowwhatimdoing=on
 gpio=27=op,dh
 gpio=10=op,dl
+core_freq=400
+core_freq_min=400
+enable_dpi_lcd=1
+display_default_lcd=1
+dpi_group=2
+dpi_mode=87
+dtparam=act_led_trigger=none
+dtparam=act_led_activelow=on
+gpio=19=pu

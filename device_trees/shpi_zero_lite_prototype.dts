@@ -211,22 +211,45 @@ compatible = "brcm,bcm2835", "brcm,bcm2708";
         };
     };
 
-    fragment@16 {
+
+    fragment@17 {
         target = <&i2c2>;
         __overlay__ {
             #address-cells = <1>;
             #size-cells = <0>;
             status = "okay";
-            aht10@38 {
-                compatible = "aht10";
-                reg = <0x38>;
-
+            bmp280@77 {
+                compatible = "bosch,bmp280";
+                reg = <0x77>;
             };
         };
     };
 
+   fragment@18 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+	    sht3x@44 {
+            compatible = "sht3x";
+            reg = <0x44>;
+            };
+     };
+    };
 
-
+   fragment@19 {
+        target = <&i2c2>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            ads1015@48 {
+            compatible = "ads1015";
+            reg = <0x48>;
+            };
+     };
+    };
 
 
         fragment@20 {

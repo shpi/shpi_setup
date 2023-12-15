@@ -22,9 +22,6 @@ done
 [[ $n -ge 3 ]] && echo "FAILED TO MOUNT BOOT"
 
 
-init_display
-
-
 # Auslesen der Seriennummer
 while read -r line; do
     case "$line" in
@@ -37,7 +34,6 @@ done < /proc/cpuinfo
 
 
 hardwarecheck -s
-
 
 if [[ -f /mnt/boot/splash.txt ]]; then
    SPLASH_IMG=$(awk -F '=' '/^image/{print $2}' /mnt/boot/splash.txt)
@@ -68,6 +64,15 @@ found=0
             ;;
     esac
 done < "/mnt/boot/config.txt"
+
+
+case "$model" in
+    shpi_zero_lite*)
+        init_display
+        break
+        ;;
+esac
+
 
 echo -ne "\033[0;0H" #jump to top left
 
