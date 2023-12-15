@@ -43,7 +43,7 @@
  /* slave adress 0x5B, do not change unless you know what youre doing!*/
 #define MLX90615_ADDR           (MLX90615_OP_EEPROM | 0x00)
 
-								 /* IIR coefficient */
+ /* IIR coefficient */
 #define MLX90615_CONFIG_IIR_SHIFT 12
 #define MLX90615_CONFIG_IIR_MASK (0x7 << MLX90615_CONFIG_IIR_SHIFT)
 
@@ -79,7 +79,7 @@ cuts off spikes 100% means no cut off
 #define MLX90615_TOBJ           (MLX90615_OP_RAM | 0x07)
 
 /* time for EEPROM write/erase to complete */
-#define MLX90615_TIMING_EEPROM    10
+#define MLX90615_TIMING_EEPROM    20
  /* time to hold SDA low for wake-up */
 #define MLX90615_TIMING_WAKEUP    39
  /* time before first data after wake-up */
@@ -100,7 +100,7 @@ cuts off spikes 100% means no cut off
 /* IIR spikes in %  */
 static const int mlx90615_iir_values[] =
 {
-	0, 100, 50, 33, 25, 20, 16,  14
+	100, 100, 50, 33, 25, 20, 16,  14
 };
 
 static IIO_CONST_ATTR(in_temp_object_filter_low_pass_3db_frequency_available,
@@ -150,27 +150,6 @@ static const struct attribute_group mlx90615_attr_group =
 	.attrs = mlx90615_attributes,
 };
 
-/*
- * Erase an address and write word.
- * The mutex must be locked before calling.
- */
-
-
-/*uint8_t crc8(uint8_t * data, int size)
-{
-	uint8_t crc = 0x00;
-	int bit;
-	while (size--)
-	{
-		crc ^= *data++;
-		for (bit = 0;  bit < 8; bit++)
-		{
-			if (crc & 0x80)  crc = crc << 1 ^ 0x7;
-			else crc <<= 1;
-		}
-	}
-	return(crc);
-}*/
 
 
 uint8_t crc8citt(const uint8_t *input, int len)
@@ -189,46 +168,82 @@ static s32 mlx90615_write_word(const struct i2c_client *client, u8 command,
 u16 value)
 {
 	/*
-	 * Note: The mlx90615 requires a PEC on writing but does not send us a
+	 * Note: The mlx90615 requires a PEC on writing but does send us a
 	 * custom PEC on reading.  Hence, we cannot set I2C_CLIENT_PEC in
 	 * i2c_client.flags.  As a workaround, we use i2c_smbus_xfer here.
 	 */
 	union i2c_smbus_data data;
 	s32 ret;
 
-	dev_dbg(&client->dev, "Writing 0x%x to address 0x%x", value, command);
+
+        ret = i2c_smbus_read_word_data(client, command);
+
+        if (ret < 0) {
+                dev_info(&client->dev, "Error Reading MLX90615, retrying");
+                return ret;
+                }
+
+
+        if (ret != value) {
+
+	dev_info(&client->dev, "Writing 0x%x to address 0x%x", value, command);
 
 	data.word = 0x0000;			 /* erase command */
+
 	ret = i2c_smbus_xfer(client->adapter, client->addr,
 		client->flags | I2C_CLIENT_PEC,
 		I2C_SMBUS_WRITE, command,
 		I2C_SMBUS_WORD_DATA, &data);
+
+        msleep(MLX90615_TIMING_EEPROM);
+
 	if (ret < 0)
-		return ret;
+		return mlx90615_write_word(client, command, value);
+
 
 	msleep(MLX90615_TIMING_EEPROM);
 
 	data.word = value;			 /* actual write */
+
 	ret = i2c_smbus_xfer(client->adapter, client->addr,
 		client->flags | I2C_CLIENT_PEC,
 		I2C_SMBUS_WRITE, command,
 		I2C_SMBUS_WORD_DATA, &data);
 
-	msleep(MLX90615_TIMING_EEPROM);
+       msleep(MLX90615_TIMING_EEPROM);
+
+       if (ret < 0)
+                return mlx90615_write_word(client, command, value);
+
+
+        if (value !=  i2c_smbus_read_word_data(client, command)) {
+
+        dev_info(&client->dev, "Error Writing 0x%x to address 0x%x, retrying", value, command);
+        msleep(MLX90615_TIMING_EEPROM);
+        return mlx90615_write_word(client,command, value);
+
+        } else {
+
+        dev_info(&client->dev, "Successful: 0x%x to address 0x%x", value, command);
+
+
+        } }
+
+        else { dev_info(&client->dev, "No Write needed: 0x%x to address 0x%x", value, command); }
 
 	return ret;
 }
 
 
 /*
+
  * Find the IIR value inside mlx90615_iir_values array and return its position
  * which is equivalent to the bit value in sensor register
  */
-static inline s32 mlx90615_iir_search(const struct i2c_client *client,
-int value)
+static inline s32 mlx90615_iir_search(const struct i2c_client *client, int value)
 {
 	int i;
-	s32 ret;
+	s32 ret, ret2;
 
 	for (i = 1; i < ARRAY_SIZE(mlx90615_iir_values); ++i)
 	{
@@ -239,27 +254,34 @@ int value)
 	if (i == ARRAY_SIZE(mlx90615_iir_values))
 		return -EINVAL;
 
+
 	/*
 	 * CONFIG register values must not be changed so
 	 * we must read them before we actually write
 	 * changes
+         * factory default: i2cset -y 2 0x5b 0x12 0x14d9 wp
 	 */
+
 	ret = i2c_smbus_read_word_data(client, MLX90615_CONFIG);
-	if (ret < 0)
+	if (ret < 0) {
+                dev_info(&client->dev, "Error Reading MLX90615 Config, retrying");
 		return ret;
+                }
 
+        dev_info(&client->dev, "ACTUAL MLX90615 CONFIG WORD 0x12: 0x%x", ret);
+
+
+        ret2 = ret;
+	ret2 &= ~(MLX90615_CONFIG_IIR_MASK);
+	ret2 |= (i << MLX90615_CONFIG_IIR_SHIFT);
+
+        if (ret2 & 1 == 0) return 0;     // SMBUS needs to be always active
+        if (ret2 & 0x400 == 0) return 0; // GAIN 40 required
+
+        ret2 |= 1; // set SMBUS mode always active !
 	/* Write changed values */
-	/* ret = ret & 0x8FFF;
-	 ret = ret + (i << MLX90615_CONFIG_IIR_SHIFT);     */
-
-	ret &= ~MLX90615_CONFIG_IIR_MASK;
-	ret |= i << MLX90615_CONFIG_IIR_SHIFT;
-
-	/* Write changed values */
-
-	ret = mlx90615_write_word(client, MLX90615_CONFIG,ret);
-
-	return ret;
+        if (ret2 != ret) return mlx90615_write_word(client, MLX90615_CONFIG,ret2);
+        else return 0;
 }
 
 
@@ -346,8 +368,7 @@ int *val2, long mask)
 				return ret;
 
 			*val = mlx90615_iir_values[(ret & MLX90615_CONFIG_IIR_MASK) >> MLX90615_CONFIG_IIR_SHIFT ] / 100;
-			*val2 = (mlx90615_iir_values[(ret & MLX90615_CONFIG_IIR_MASK) >> MLX90615_CONFIG_IIR_SHIFT ] % 100) *
-				10000;
+			*val2 = (mlx90615_iir_values[(ret & MLX90615_CONFIG_IIR_MASK) >> MLX90615_CONFIG_IIR_SHIFT ] % 100) * 10000;
 			return IIO_VAL_INT_PLUS_MICRO;
 
 		default:
@@ -373,8 +394,7 @@ int val2, long mask)
 		              val2 / MLX90615_CONST_EMISSIVITY_RESOLUTION;
 
 			mutex_lock(&data->lock);
-			ret = mlx90615_write_word(data->client, MLX90615_EMISSIVITY,
-				val);
+			ret = mlx90615_write_word(data->client, MLX90615_EMISSIVITY,val);
 			mutex_unlock(&data->lock);
 
 			return ret;
@@ -384,8 +404,8 @@ int val2, long mask)
 				return -EINVAL;
 
 			mutex_lock(&data->lock);
-			ret = mlx90615_iir_search(data->client,
-				val * 100 + val2 / 10000);
+                        ret = mlx90615_iir_search(data->client,
+					  val * 100 + val2 / 10000);
 			/* write IIR */
 			mutex_unlock(&data->lock);
 
@@ -562,7 +582,7 @@ static const struct iio_chan_spec mlx90615_channels[] =
 	{
 		.type = IIO_TEMP,
 		.modified = 1,
-		.indexed = 1,
+		//.indexed = 1,
 		.channel2 = IIO_MOD_TEMP_AMBIENT,
 		.info_mask_separate = BIT(IIO_CHAN_INFO_RAW),
 		.info_mask_shared_by_type = BIT(IIO_CHAN_INFO_OFFSET) |
@@ -580,7 +600,7 @@ static const struct iio_chan_spec mlx90615_channels[] =
 	{
 		.type = IIO_TEMP,
 		.modified = 1,
-		.indexed = 1,
+		//.indexed = 1,
 		.channel2 = IIO_MOD_TEMP_OBJECT,
 		.info_mask_separate = BIT(IIO_CHAN_INFO_RAW) |
 		BIT(IIO_CHAN_INFO_CALIBEMISSIVITY) |
