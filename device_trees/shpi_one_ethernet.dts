@@ -54,7 +54,7 @@
             #size-cells = <0>;
             status = "okay";
             ft6236: ft6236@5d {
-                compatible = "goodix,gt911";
+                compatible = "shpi,gt911";
                 reg = <0x5d>;
                 pinctrl-names = "default";
                 pinctrl-0 = <&goodix_pins>;
@@ -76,7 +76,7 @@
             #size-cells = <0>;
             status = "okay";
             ft62362: ft62362@14 {
-                compatible = "goodix,gt911";
+                compatible = "shpi,gt911";
                 reg = <0x14>;
                 pinctrl-names = "default";
                 pinctrl-0 = <&goodix_pins>;

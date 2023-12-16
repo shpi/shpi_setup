@@ -73,8 +73,8 @@ print_dots() {
 }
 
 # Clear screen and set cursor visibility to false
-clear
-echo -ne "\033[?25l"
+#clear
+printf "\033[?25l"
 
 # Print dots with a delay
 for i in $(seq 1 $num_dots); do
@@ -83,4 +83,4 @@ for i in $(seq 1 $num_dots); do
 done
 
 # Reset cursor visibility
-echo -ne "\033[?25h"
+printf "\033[?25h"

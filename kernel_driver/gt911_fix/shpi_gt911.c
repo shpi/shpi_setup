@@ -959,7 +959,7 @@ err_sysfs_remove_group:
 
 }
 
-static int goodix_ts_remove(struct i2c_client *client)
+static void goodix_ts_remove(struct i2c_client *client)
 {
 	struct goodix_ts_data *ts = i2c_get_clientdata(client);
 
@@ -970,7 +970,7 @@ static int goodix_ts_remove(struct i2c_client *client)
   gpiod_put(ts->gpiod_int);
   gpiod_put(ts->gpiod_rst);
   sysfs_remove_group(&client->dev.kobj, &goodix_attr_group);
-	return 0;
+	
 }
 
 static int __maybe_unused goodix_suspend(struct device *dev)
@@ -1204,14 +1204,7 @@ MODULE_DEVICE_TABLE(acpi, goodix_acpi_match);
 
 #ifdef CONFIG_OF
 static const struct of_device_id goodix_of_match[] = {
-	{ .compatible = "goodix,gt911" },
-	{ .compatible = "goodix,gt9110" },
-	{ .compatible = "goodix,gt912" },
-	{ .compatible = "goodix,gt927" },
-	{ .compatible = "goodix,gt9271" },
-	{ .compatible = "goodix,gt928" },
-	{ .compatible = "goodix,gt9286" },
-	{ .compatible = "goodix,gt967" },
+        { .compatible = "shpi,gt911" },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, goodix_of_match);
