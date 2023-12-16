@@ -4,6 +4,7 @@
 #include <linux/module.h>
 #include <linux/usb.h>
 #include <linux/firmware.h>
+#include <linux/delay.h>
 
 
 #define a32u4_VENDOR_ID 		0x03eb
@@ -59,6 +60,7 @@ static int a32u4_probe(struct usb_interface *intf, const struct usb_device_id *i
         unsigned char *buf;
         int ret;
 
+
         buf = kmalloc(5, GFP_KERNEL);
         memcpy(buf, data, 5);
 
@@ -75,6 +77,11 @@ static int a32u4_probe(struct usb_interface *intf, const struct usb_device_id *i
 	}
 
 	dev->udev = usb_get_dev(udev);
+        dev_info(&udev->dev,"Starting ATmega32u4 in 1s...\n");
+        msleep(1000); // Sleep for 1000 milliseconds or 1 second
+
+
+
 	usb_set_intfdata(intf, dev);
 
 
@@ -90,7 +97,7 @@ static int a32u4_probe(struct usb_interface *intf, const struct usb_device_id *i
                 }
 
 
-    ret = usb_control_msg(dev->udev,
+       ret = usb_control_msg(dev->udev,
                               usb_sndctrlpipe(dev->udev, 0),
                               DFU_CLRSTATUS,
                               0b00100001,
@@ -129,7 +136,7 @@ static int a32u4_probe(struct usb_interface *intf, const struct usb_device_id *i
                                 "1. start command failed with %d\n", ret);
                 }
 
-        /*
+   
 
         ret = usb_control_msg(dev->udev,
                               usb_sndctrlpipe(dev->udev, 0),
@@ -150,7 +157,7 @@ static int a32u4_probe(struct usb_interface *intf, const struct usb_device_id *i
                 }
 
 
-        */
+        
 
 	dev_dbg(&intf->dev, "a32u4_probe\n");
 	dev_info(&intf->dev, "%s start\n", __func__);

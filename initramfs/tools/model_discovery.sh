@@ -37,7 +37,7 @@ for entry in $I2C_DEVICES; do
     # Capture the output and exit status of i2cget
     i2cget_output=$(i2cget -s"$ADDRESS" -dr -ib 1)
     i2cget_status=$?
-
+    sleep 0.1
     # Echo the name and i2cget output to the log file
     echo -n "$NAME " | tee -a /mnt/boot/log.txt
     echo "$i2cget_output" | tee -a /mnt/boot/log.txt
@@ -53,6 +53,7 @@ done
 # Define USB devices and their IDs
 USB_DEVICES="
 ATMEGA_USB=03eb:2ff4
+ATMEGA_LUFA_USB=03eb:204b
 HUB8836_USB=214b:7000
 HUB8836A_USB=214b:7250
 ZIGBEE_USB=0451:16ae
@@ -77,7 +78,6 @@ for entry in $USB_DEVICES; do
 
             if [ "$deviceID" = "$ID" ]; then
                 eval "$NAME=1"  # Set the device variable to 1 (found)
-                echo "$NAME=1" | tee -a /mnt/boot/log.txt
                 break
             fi
         fi
@@ -89,16 +89,17 @@ done
 for entry in $USB_DEVICES; do
     NAME="${entry%%=*}"
     eval "status=\$$NAME"  # Retrieve the status
-    echo "$NAME: $status"
+    echo "$NAME: $status" | tee -a /mnt/boot/log.txt
 done
 
 
-MODEL_NAMES="shpi_one shpi_zero_prototype shpi_zero shpi_zero_lite_prototype shpi_zero_lite"
+MODEL_NAMES="shpi_one shpi_one_ethernet shpi_zero_prototype shpi_zero shpi_zero_lite_prototype shpi_zero_lite"
+
 
 shpi_one="
-ATMEGA|ATMEGA_USB=1
+ATMEGA|ATMEGA_USB|ATMEGA_LUFA_USB=1
 MLX|CALIPILE=1
-HUB8836A_USB|HUB9514_USB=1
+HUB8836A_USB=1
 SHT3x=1
 TOUCH_ONE|TOUCH_ONE2=1
 ADS1015=0
@@ -106,6 +107,20 @@ INA219=1
 HUB8836_USB=0
 HS100B_USB=1
 "
+
+
+shpi_one_ethernet="
+ATMEGA|ATMEGA_USB|ATMEGA_LUFA_USB=1
+MLX|CALIPILE=1
+HUB9514_USB=1
+SHT3x=1
+TOUCH_ONE|TOUCH_ONE2=1
+ADS1015=0
+INA219=1
+HUB8836_USB=0
+HS100B_USB=1
+"
+
 
 shpi_zero_prototype="
 TOUCH_ZERO=1
@@ -161,47 +176,63 @@ TOUCH_ONE=0
 TOUCH_ONE2=0
 "
 
-for model in $MODEL_NAMES; do
-    # Dynamically get the conditions for the current model
-    eval "conditions=\$$model"
 
+split_string() {
+    string=$1
+    delimiter=$2
+    result=""
+    while [ "$string" != "" ]; do
+        token=${string%%$delimiter*}
+        result="$result $token"
+        if [ "$string" = "$token" ]; then
+            string=''
+        else
+            string=${string#*$delimiter}
+        fi
+    done
+    echo $result
+}
+
+
+
+# Function to check conditions
+check_conditions() {
+    conditions="$1"
     conditions_met=true
     for condition in $conditions; do
         devices="${condition%%=*}"
         expected_status="${condition##*=}"
-        
-        case "$devices" in
-            *|*)
-                or_condition_met=false
-                oldIFS="$IFS"
-                IFS='|'
-                set -f # disable globbing
-                for device in $devices; do
-                    eval "actual_status=\$$device"
-                    if [ "$actual_status" = "$expected_status" ]; then
-                        or_condition_met=true
-                        break
-                    fi
-                done
-                IFS="$oldIFS"
-                set +f # enable globbing
-                if [ "$or_condition_met" = false ]; then
-                    conditions_met=false
+
+        # Check if the condition has an OR ('|')
+        if echo "$devices" | grep -q '\|'; then
+            # Handle OR conditions
+            or_condition_met=false
+            for device in $(split_string "$devices" "|"); do
+                eval "status=\$$device"
+                if [ "$status" = "$expected_status" ]; then
+                    or_condition_met=true
                     break
                 fi
-                ;;
-            *)
-                eval "actual_status=\$$devices"
-                if [ "$actual_status" != "$expected_status" ]; then
-                    conditions_met=false
-                    break
-                fi
-                ;;
-        esac
+            done
+            if [ "$or_condition_met" = false ]; then
+                conditions_met=false
+                echo "Condition NOT met for one of: $devices" >> /mnt/boot/log.txt
+            fi
+        else
+            # Handle single device condition
+            eval "status=\$$devices"
+            if [ "$status" != "$expected_status" ]; then
+                conditions_met=false
+                echo "Condition NOT met: $devices" >> /mnt/boot/log.txt
+            fi
+        fi
     done
 
-    if [ "$conditions_met" = true ]; then
-        echo "$model model conditions are met."
+    if [ "$conditions_met" = false ]; then
+        echo "One or more conditions not met for model $model." >> /mnt/boot/log.txt
+    else
+        echo "All conditions met for model $model." >> /mnt/boot/log.txt
+        sync
         # Perform actions for the model
         echo "[0x$serial]" >> /mnt/boot/config.txt
         echo "model=$model" >> /mnt/boot/config.txt
@@ -220,16 +251,30 @@ for model in $MODEL_NAMES; do
         ;;
         esac
 
-
         sync
         umount /mnt/boot
         echo b > /proc/sysrq-trigger
         break
+
     fi
+}
+
+
+
+for model in $MODEL_NAMES; do
+    # Dynamically get the conditions for the current model
+
+    eval "model_conditions=\$$model"
+    # Check conditions for the current model
+    check_conditions "$model_conditions"
+
 done
 
+
+
+
 if [ "$conditions_met" != true ]; then
-    echo "No SHPI model conditions met. Please check for further instructions." | tee -a /mnt/boot/log.txt
+    echo "No SHPI model conditions met. Please check for further instructions." >> /mnt/boot/log.txt
     sleep 5
 fi
 

@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
   int a;
   int arr_pointer;
   uint8_t functions[28];
+  uint8_t drive_state[28];
   uint8_t pulled_low[28];
   uint8_t pulled_high[28];
   uint8_t shorted_vcc[28];
@@ -111,6 +112,7 @@ int main(int argc, char **argv) {
     // printf("GPIO %d", i);
     // printf(" function %d \n", bcm2835_get_fsel(i));
     functions[i] = bcm2835_get_fsel(i);
+    drive_state[i] = bcm2835_gpio_lev(i);
     bcm2835_gpio_fsel(i, BCM2835_GPIO_FSEL_INPT);
     bcm2835_gpio_set_pud(i, BCM2835_GPIO_PUD_UP);
     /*
@@ -216,8 +218,13 @@ int main(int argc, char **argv) {
 
     if (!is_in_array(shorted_gnd,sizeof(shorted_gnd),i) &&
         !is_in_array(shorted_vcc,sizeof(shorted_vcc),i) &&
-        !is_in_array(shorted_pin,sizeof(shorted_pin),i))
+        !is_in_array(shorted_pin,sizeof(shorted_pin),i)) {
     bcm2835_gpio_fsel(i, functions[i]);
+    if (drive_state[i] == HIGH && functions[i] == BCM2835_GPIO_FSEL_INPT)  bcm2835_gpio_set_pud(i, BCM2835_GPIO_PUD_UP);  else  bcm2835_gpio_set_pud(i, BCM2835_GPIO_PUD_DOWN); 
+
+    if (drive_state[i] == HIGH && functions[i] == BCM2835_GPIO_FSEL_OUTP) bcm2835_gpio_set(i); else bcm2835_gpio_clr(i);
+
+   }
     else bcm2835_gpio_fsel(i, BCM2835_GPIO_FSEL_INPT);
   }
 

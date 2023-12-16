@@ -106,7 +106,6 @@ static int pwm_backlight_update_status(struct backlight_device *bl)
 	if (brightness > 20) {
 
                 if (brightness == bl->props.max_brightness)
-
                 brightness -= 1;
 
 		pwm_get_state(pb->pwm, &state);

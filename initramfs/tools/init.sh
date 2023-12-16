@@ -66,23 +66,44 @@ found=0
 done < "/mnt/boot/config.txt"
 
 
-case "$model" in
+case "$MODEL" in
     shpi_zero_lite*)
         init_display
-        break
+        ;;
+    *)
+        init_atmega 
         ;;
 esac
 
 
-echo -ne "\033[0;0H" #jump to top left
+echo -ne "\033[18;60H" #jump to top left
 
-    if [ $found -eq 1 ]; then
-        echo "Model: $MODEL"
-    else
-        echo "Model discovery necessary. Starting..."
-        model_discovery
-    fi
-
+if [ $found -eq 1 ]; then
+    MODEL=${MODEL#shpi}
+    # Remove underscores and convert to uppercase manually
+    NEW_MODEL=""
+    MODEL_LENGTH=${#MODEL}
+    i=0
+    while [ $i -lt $MODEL_LENGTH ]; do
+        CHAR="${MODEL:$i:1}"
+        if [ "$CHAR" = "_" ]; then
+            CHAR=" "  # Replace underscore with space
+        else
+            # Manual uppercase conversion using case statement
+            case "$CHAR" in
+                [a-z]) CHAR=$(printf "\\$(printf '%03o' $(( $(printf '%d' "'$CHAR") - 32 )))") ;;
+            esac
+        fi
+        NEW_MODEL="${NEW_MODEL}${CHAR}"
+        i=$((i + 1))
+    done
+    WHITE='\033[1;37m'
+    NO_COLOR='\033[0m'
+    echo -e "${WHITE}$NEW_MODEL${NO_COLOR}"
+else
+    echo "Model discovery necessary. Starting..."
+    model_discovery
+fi
 
 umount /mnt/boot
 mount -o ro /dev/mmcblk0p2 /mnt/root || Rescue_Shell

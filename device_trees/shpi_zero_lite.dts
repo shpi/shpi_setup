@@ -174,8 +174,8 @@ compatible = "brcm,bcm2835", "brcm,bcm2708";
                 __overlay__ {
                         zero_lite_backlight: zero_lite_backlight {
                                 compatible = "lite-backlight";
-                                max-brightness = <1023>;
-                                default-brightness-level = <512>;
+                                max-brightness = <4095>;
+                                default-brightness-level = <2048>;
                                 pwms = <&pwm 1 5000000>;
                                 power-supply = <&vdd_3v3_reg>;
                                 status = "okay";
