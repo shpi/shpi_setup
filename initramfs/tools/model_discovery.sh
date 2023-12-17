@@ -14,6 +14,8 @@ echo "Serial:$serial" > /mnt/boot/log.txt
 
 hardwarecheck | tee -a /mnt/boot/log.txt
 
+sleep 3
+
 I2C_DEVICES="
 ATMEGA=2a
 AHT10=38
@@ -84,8 +86,6 @@ for entry in $USB_DEVICES; do
     done
 done
 
-
-
 for entry in $USB_DEVICES; do
     NAME="${entry%%=*}"
     eval "status=\$$NAME"  # Retrieve the status
@@ -107,7 +107,6 @@ INA219=1
 HUB8836_USB=0
 HS100B_USB=1
 "
-
 
 shpi_one_ethernet="
 ATMEGA|ATMEGA_USB|ATMEGA_LUFA_USB=1

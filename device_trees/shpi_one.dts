@@ -35,17 +35,6 @@
 	};
 	
 	
-    fragment@3 {
-                target = <&gpio>;
-                __overlay__ {
-                        goodix_pins: goodix_pins {
-                                brcm,pins = <26>; // interrupt and reset
-                                brcm,function = <0>; // in
-                                brcm,pull = <2>; // pull-up
-                        };
-                };
-        };
-	
 
     fragment@4 {
         target = <&i2c2>;
@@ -56,8 +45,6 @@
             ft6236: ft6236@5d {
                 compatible = "shpi,gt911";
                 reg = <0x5d>;
-                pinctrl-names = "default";
-                pinctrl-0 = <&goodix_pins>;
                 interrupt-parent = <&gpio>;
                 interrupts = <26 2>;
                 touchscreen-size-x = <480>;
@@ -78,8 +65,6 @@
             ft62362: ft62362@14 {
                 compatible = "shpi,gt911";
                 reg = <0x14>;
-                pinctrl-names = "default";
-                pinctrl-0 = <&goodix_pins>;
                 interrupt-parent = <&gpio>;
                 interrupts = <26 2>;
                 touchscreen-size-x = <480>;

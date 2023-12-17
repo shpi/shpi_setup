@@ -93,7 +93,7 @@ int main() {
     closedir(bus_dir);
 
     if (!found) {
-        printf("Device not found\n");
+        printf(""); //no error message here
         return 1;
     }
 

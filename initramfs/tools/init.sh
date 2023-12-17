@@ -33,6 +33,24 @@ while read -r line; do
 done < /proc/cpuinfo
 
 
+found=0
+ while read -r line; do
+    case "$line" in
+        "[0x$serial]")
+            found=1
+            ;;
+        model=*)
+            MODEL=${line#model=}
+            ;;
+    esac
+done < "/mnt/boot/config.txt"
+
+#make usb error port3 inivisble for ONE, due to pullups resistors for zm5304
+printf "\e[30m"
+
+
+
+if [ $found -eq 1 ]; then
 hardwarecheck -s
 
 if [[ -f /mnt/boot/splash.txt ]]; then
@@ -53,18 +71,6 @@ fi
 
 
 
-found=0
- while read -r line; do
-    case "$line" in
-        "[0x$serial]")
-            found=1
-            ;;
-        model=*)
-            MODEL=${line#model=}
-            ;;
-    esac
-done < "/mnt/boot/config.txt"
-
 
 case "$MODEL" in
     shpi_zero_lite*)
@@ -76,9 +82,6 @@ case "$MODEL" in
 esac
 
 
-echo -ne "\033[18;60H" #jump to top left
-
-if [ $found -eq 1 ]; then
     MODEL=${MODEL#shpi}
     # Remove underscores and convert to uppercase manually
     NEW_MODEL=""
@@ -98,8 +101,8 @@ if [ $found -eq 1 ]; then
         i=$((i + 1))
     done
     WHITE='\033[1;37m'
-    NO_COLOR='\033[0m'
-    echo -e "${WHITE}$NEW_MODEL${NO_COLOR}"
+    NO_COLOR='\033[30m'
+    echo -e "\033[18;60H${WHITE}$NEW_MODEL${NO_COLOR}"
 else
     echo "Model discovery necessary. Starting..."
     model_discovery
