@@ -92,9 +92,9 @@ cuts off spikes 100% means no cut off
 /* Scale in milliKelvin (0.02 * 1000) */
 #define MLX90615_CONST_SCALE 20
  /* max value for emissivity */
-#define MLX90615_CONST_RAW_EMISSIVITY_MAX 16384
+#define MLX90615_CONST_RAW_EMISSIVITY_MAX 16383
  /* 1/16384 ~ 0.000061035 */
-#define MLX90615_CONST_EMISSIVITY_RESOLUTION 61035
+#define MLX90615_CONST_EMISSIVITY_RESOLUTION 61038
 
 /* Bandwidth values for IIR filtering */
 /* IIR spikes in %  */
@@ -172,6 +172,7 @@ u16 value)
 	 * custom PEC on reading.  Hence, we cannot set I2C_CLIENT_PEC in
 	 * i2c_client.flags.  As a workaround, we use i2c_smbus_xfer here.
 	 */
+
 	union i2c_smbus_data data;
 	s32 ret;
 
@@ -229,7 +230,7 @@ u16 value)
 
         } }
 
-        else { dev_info(&client->dev, "No Write needed: 0x%x to address 0x%x", value, command); }
+        else { dev_info(&client->dev, "No Write needed: 0x%x to address 0x%x", value, command); return 0;}
 
 	return ret;
 }
@@ -388,9 +389,9 @@ int val2, long mask)
 	{
 		/* 1/16384 / LSB */
 		case IIO_CHAN_INFO_CALIBEMISSIVITY:
-			if (val < 0 || val2 < 0 || val > 1 || (val == 1 && val2 != 0))
+			if (val < 0 || val2 < 0 || val > 1 || (val == 1 && val2 != 0) || (val == 0 && val2 < 1))
 				return -EINVAL;
-			val = val * MLX90615_CONST_RAW_EMISSIVITY_MAX +
+			val = (val * MLX90615_CONST_RAW_EMISSIVITY_MAX) +
 		              val2 / MLX90615_CONST_EMISSIVITY_RESOLUTION;
 
 			mutex_lock(&data->lock);

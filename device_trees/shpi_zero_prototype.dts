@@ -89,20 +89,44 @@
 
 
 
-   fragment@6 {
-                target-path = "/soc";
+     fragment@6 {
+                target = <&gpio>;
                 __overlay__ {
-                        backlight: backlight {
-                                compatible = "al3050_bl";
-                                gpios = <&gpio 19 0>; /* GPIO_ACTIVE_HIGH */
-                                fb = <0xdeadbeef>;
-                                rfa_en = <1>;
+                        pwm_pins: pwm_pins {
+                                brcm,pins = <19>;
+                                brcm,function = <2>;//alt5 to select PWM01
                         };
                 };
         };
 
 
-    fragment@7 {
+        fragment@7 {
+                target = <&pwm>;
+                frag12: __overlay__ {
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&pwm_pins>;
+                        assigned-clock-rates = <1000000>;
+                        status = "okay";
+                };
+        };
+
+        fragment@8 {
+                target-path = "/";
+                __overlay__ {
+                        zero_lite_backlight: zero_lite_backlight {
+                                compatible = "lite-backlight";
+                                max-brightness = <1023>;
+                                default-brightness-level = <512>;
+                                pwms = <&pwm 1 5000000>;
+                                power-supply = <&vdd_3v3_reg>;
+                                status = "okay";
+                        };
+                };
+        };
+
+
+
+    fragment@9 {
         target = <&i2c2>;
         __overlay__ {
             #address-cells = <1>;
@@ -115,7 +139,7 @@
         };
     };
 
-    fragment@8 {
+    fragment@10 {
         target = <&i2c2>;
         __overlay__ {
             #address-cells = <1>;
@@ -130,7 +154,7 @@
     };
 
 
-    fragment@9 {
+    fragment@11 {
         target = <&i2c2>;
         __overlay__ {
             #address-cells = <1>;
@@ -143,7 +167,7 @@
         };
     };
 
-   fragment@10 {
+   fragment@12 {
         target = <&i2c2>;
         __overlay__ {
             #address-cells = <1>;
@@ -158,7 +182,7 @@
 
 
 
-   fragment@11 {
+   fragment@13 {
                 // Configure the gpio pin controller
                 target = <&gpio>;
                 __overlay__ {
@@ -169,7 +193,7 @@
                         };
                 };
         };
-        fragment@12 {
+        fragment@14 {
                 target-path = "/";
                 __overlay__ {
                         motion: motion {
@@ -177,7 +201,7 @@
                                 pinctrl-names = "default";
                                 pinctrl-0 = <&pin_state>;
                                 status = "okay";
-                                autorepeat;
+                                
 
                                 key: key {
                                         linux,code = <132>;
