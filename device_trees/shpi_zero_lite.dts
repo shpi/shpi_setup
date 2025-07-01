@@ -176,7 +176,7 @@ compatible = "brcm,bcm2835", "brcm,bcm2708";
                                 compatible = "lite-backlight";
                                 max-brightness = <4095>;
                                 default-brightness-level = <2048>;
-                                pwms = <&pwm 1 5000000>;
+                                pwms = <&pwm 1 5000000 0>;
                                 power-supply = <&vdd_3v3_reg>;
                                 status = "okay";
                         };
