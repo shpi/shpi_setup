@@ -176,7 +176,7 @@ compatible = "brcm,bcm2835", "brcm,bcm2708";
                                 compatible = "lite-backlight";
                                 max-brightness = <1023>;
                                 default-brightness-level = <512>;
-                                pwms = <&pwm 1 5000000>;
+                                pwms = <&pwm 1 5000000 0>;
                                 power-supply = <&vdd_3v3_reg>;
                                 status = "okay";
                         };
@@ -232,7 +232,7 @@ compatible = "brcm,bcm2835", "brcm,bcm2708";
             #size-cells = <0>;
             status = "okay";
 	    sht3x@44 {
-            compatible = "sht3x";
+            compatible = "sensirion,sht3x";
             reg = <0x44>;
             };
      };
